@@ -141,17 +141,22 @@ function checkAnswers() {
     const div = document.createElement("div");
 
     if (ans === "-" || ans === "") {
+      // Not done
       div.className = "notdone";
       div.innerHTML = `<strong>${num}.</strong> ⚪ Not done<br>
                        <strong>Expected:</strong> ${key || "(none)"}<br>
                        <label>Correction:</label>
                        <input class="correction" placeholder="Type your correction...">`;
       notDoneCount++;
-    } else if (key.toLowerCase() === ans.toLowerCase()) {
+    } 
+    else if (key.toLowerCase() === ans.toLowerCase()) {
+      // Correct
       div.className = "correct";
       div.innerHTML = `<strong>${num}.</strong> ✅ Correct - <em>${ans}</em>`;
       correctCount++;
-    } else {
+    } 
+    else {
+      // Wrong
       div.className = "wrong";
       div.innerHTML = `<strong>${num}.</strong> ❌ Wrong<br>
                        <strong>Expected:</strong> ${key || "(none)"}<br>
