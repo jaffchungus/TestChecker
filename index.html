@@ -7,7 +7,7 @@
 <style>
   body {
     font-family: "Segoe UI", sans-serif;
-    background: #f2f5fa;
+    background: #f4f6fb;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -59,6 +59,12 @@
     margin-bottom: 10px;
     padding: 10px;
   }
+  .notdone {
+    background: #fff6d5;
+    border-left: 5px solid #ffcc00;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
   .correction {
     margin-top: 5px;
     display: block;
@@ -68,21 +74,29 @@
     border: 1px solid #aaa;
     font-size: 14px;
   }
+  #score {
+    margin-top: 20px;
+    font-size: 18px;
+    text-align: center;
+    font-weight: bold;
+    color: #2b2b2b;
+  }
 </style>
 </head>
 <body>
 
 <h1>Answer Checker 🧠</h1>
 
-<label><strong>Questions (or Answer Key):</strong></label>
-<textarea id="keyBox" placeholder="Enter correct answers or question list here..."></textarea>
+<label><strong>Answer Key (or Questions):</strong></label>
+<textarea id="keyBox" placeholder="Enter the correct answers here..."></textarea>
 
 <label><strong>Your Answers:</strong></label>
-<textarea id="answerBox" placeholder="Enter student answers here..."></textarea>
+<textarea id="answerBox" placeholder="Enter your answers here..."></textarea>
 
 <button onclick="checkAnswers()">Check Answers</button>
 
 <div id="results"></div>
+<div id="score"></div>
 
 <script>
 function parseList(text) {
@@ -111,18 +125,32 @@ function checkAnswers() {
   ansList.sort((a, b) => a.num - b.num);
 
   const results = document.getElementById("results");
+  const scoreDiv = document.getElementById("score");
   results.innerHTML = "";
+  scoreDiv.innerHTML = "";
+
+  let correctCount = 0;
+  let wrongCount = 0;
+  let notDoneCount = 0;
 
   const maxLen = Math.max(keyList.length, ansList.length);
   for (let i = 0; i < maxLen; i++) {
-    const key = keyList[i] ? keyList[i].text : "";
-    const ans = ansList[i] ? ansList[i].text : "";
+    const key = keyList[i] ? keyList[i].text.trim() : "";
+    const ans = ansList[i] ? ansList[i].text.trim() : "";
     const num = i + 1;
     const div = document.createElement("div");
 
-    if (key.toLowerCase().trim() === ans.toLowerCase().trim()) {
+    if (ans === "-" || ans === "") {
+      div.className = "notdone";
+      div.innerHTML = `<strong>${num}.</strong> ⚪ Not done<br>
+                       <strong>Expected:</strong> ${key || "(none)"}<br>
+                       <label>Correction:</label>
+                       <input class="correction" placeholder="Type your correction...">`;
+      notDoneCount++;
+    } else if (key.toLowerCase() === ans.toLowerCase()) {
       div.className = "correct";
       div.innerHTML = `<strong>${num}.</strong> ✅ Correct - <em>${ans}</em>`;
+      correctCount++;
     } else {
       div.className = "wrong";
       div.innerHTML = `<strong>${num}.</strong> ❌ Wrong<br>
@@ -130,9 +158,15 @@ function checkAnswers() {
                        <strong>Got:</strong> ${ans || "(none)"}<br>
                        <label>Correction:</label>
                        <input class="correction" placeholder="Type your correction...">`;
+      wrongCount++;
     }
     results.appendChild(div);
   }
+
+  const total = correctCount + wrongCount + notDoneCount;
+  const percent = total > 0 ? ((correctCount / total) * 100).toFixed(1) : 0;
+
+  scoreDiv.innerHTML = `Score: ${correctCount}/${total} (${percent}%)`;
 }
 </script>
 
